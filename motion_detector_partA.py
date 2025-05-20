@@ -17,6 +17,10 @@ def streamer(out_conn, video_file_name):
         raise ValueError(f"Could not open video {video_file_name}.")
 
     fps_rate = captured_video.get(cv.CAP_PROP_FPS)
+    if fps_rate <= 0:
+        out_conn.send("END")
+        out_conn.close()
+        raise ValueError(f"FPS rate must be greater than 0.")
 
     while True:
         ret, frame = captured_video.read()
@@ -38,6 +42,9 @@ def detector(in_conn, out_conn):
                 out_conn.send("END")
                 out_conn.close()
                 break
+
+            if curr_frame is None:
+                continue
 
             gray_frame = cv.cvtColor(curr_frame, cv.COLOR_BGR2GRAY)
             if count == 0:
@@ -70,7 +77,9 @@ def presenter(in_conn):
             for detection in curr_detections:
                 x, y, w, h = detection
                 green_color = (0, 255, 0)
-                cv.rectangle(curr_frame, (x, y), (x+w, y+h), green_color, 2)
+                curr_height, curr_width = curr_frame.shape[:2]
+                cv.rectangle(curr_frame, (max(0, x), max(0, y)),
+                             (min(curr_width, x+w), min(curr_height, y+h)), green_color, 2)
 
             timestamp = datetime.now().strftime("%H:%M:%S")
             red_color = (0, 0, 255)
