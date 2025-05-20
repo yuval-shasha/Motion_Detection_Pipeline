@@ -5,6 +5,7 @@ A Python-based multiprocessing video motion detection tool that:
 - Applies a simple vmd (Visual Motion Detection) algorithm.
 - Sends result via pipe.
 - Presents detections (blurred in partB) with timestamp on screen.
+- Closes program (including all processes) when video is over.
 
 ## Features 
 
