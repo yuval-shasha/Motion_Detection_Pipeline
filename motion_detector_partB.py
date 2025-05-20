@@ -62,8 +62,11 @@ def presenter(in_conn):
     while True:
         if in_conn.poll(0.5):
             curr_data = in_conn.recv()
+
             if isinstance(curr_data, str) and curr_data == "END":
                 in_conn.close()
+                break
+                
             curr_frame, curr_detections = curr_data
             for detection in curr_detections:
                 x, y, w, h = detection
@@ -71,8 +74,8 @@ def presenter(in_conn):
                 cv.rectangle(curr_frame, (x, y), (x+w, y+h), green_color, 2)
 
             timestamp = datetime.now().strftime("%H:%M:%S")
-            blue_color = (0, 0, 255)
-            cv.putText(curr_frame, timestamp, (0,25), cv.FONT_HERSHEY_SIMPLEX, 1, blue_color, 2)
+            red_color = (0, 0, 255)
+            cv.putText(curr_frame, timestamp, (0,25), cv.FONT_HERSHEY_SIMPLEX, 1, red_color, 2)
 
             cv.imshow("Video with detections", curr_frame)
             if cv.waitKey(1) & 0xFF == ord("q"):
