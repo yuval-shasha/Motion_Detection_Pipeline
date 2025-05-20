@@ -66,11 +66,14 @@ def presenter(in_conn):
             if isinstance(curr_data, str) and curr_data == "END":
                 in_conn.close()
                 break
-                
+
             curr_frame, curr_detections = curr_data
             for detection in curr_detections:
                 x, y, w, h = detection
                 green_color = (0, 255, 0)
+                roi = curr_frame[y:y + h, x:x + w]
+                blurred_roi = cv.GaussianBlur(roi, (25, 25), 0)
+                curr_frame[y:y + h, x:x + w] = blurred_roi
                 cv.rectangle(curr_frame, (x, y), (x+w, y+h), green_color, 2)
 
             timestamp = datetime.now().strftime("%H:%M:%S")
